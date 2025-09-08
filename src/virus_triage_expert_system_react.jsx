@@ -456,7 +456,7 @@ export default function VirusTriageExpertSystem() {
 
       (async () => {
         const swipl = await SWIPL({ arguments: ["-q"] });
-        const url = new URL("/prolog/bayesianModel.pl", window.location.href).href;
+        const url = new URL(`${import.meta.env.BASE_URL}/prolog/bayesianModel.pl`, window.location.origin).href;
         await swipl.prolog.consult(url);
 
         const q = swipl.prolog.query(
