@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import SWIPL from "swipl-wasm";
 import { createPortal } from "react-dom";
+import variablePng from "./assets/variable.png";
 
 /**
  * Virus Triage Expert System — Single-file React component
@@ -1025,7 +1026,7 @@ export default function VirusTriageExpertSystem() {
 
               </div>
               <div className="w-full">
-                <EnlargeableImage src="../src/assets/variable.png" className="w-full mt-3 rounded-2xl" />
+                <EnlargeableImage src={variablePng} className="w-full mt-3 rounded-2xl" />
               </div>
               
 
