@@ -1041,11 +1041,11 @@ export default function VirusTriageExpertSystem() {
                     <td className="text-center"> 
                       <table className="w-full">
                         <tr>
-                            <td className="w-12 underline">{(probJointInfectedBioSym*probConditionHistoryIfInfected).toFixed(4)}</td>
+                            <td className="w-12 underline">{(probJointInfectedBioSym*probConditionHistoryIfInfected).toFixed(6)}</td>
                             <td rowspan="2" className="w-10">= {(probJointInfectedBioSym*probConditionHistoryIfInfected/(probJointInfectedBioSym*probConditionHistoryIfInfected+probJointNotInfectedBioSym*probConditionHistoryIfNotInfected)).toFixed(2)}</td>
                         </tr>
                         <tr>
-                            <td className="w-12 items-start">{(probJointInfectedBioSym*probConditionHistoryIfInfected+probJointNotInfectedBioSym*probConditionHistoryIfNotInfected).toFixed(4)}</td>
+                            <td className="w-12 items-start">{(probJointInfectedBioSym*probConditionHistoryIfInfected+probJointNotInfectedBioSym*probConditionHistoryIfNotInfected).toFixed(6)}</td>
                         </tr>
                       </table>
                     </td>
