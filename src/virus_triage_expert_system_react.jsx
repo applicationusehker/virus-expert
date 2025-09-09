@@ -57,7 +57,8 @@ const COMORBIDITIES = [
   { key: "cardiovascular", label: "Cardiovascular disease" },
   { key: "respiratory", label: "Chronic respiratory disease" },
   { key: "cancer", label: "Cancer" },
-  { key: "unknown", label: "Unknown" },
+  { key: "unknown", label: "Not Available" },
+  { key: "none", label: "None" },
 ];
 
 const SurfaceType = {
@@ -230,7 +231,7 @@ export default function VirusTriageExpertSystem() {
   const [evaluated, setEvaluated] = useState(false);
 
   const comorbidityCount = useMemo(
-    () => COMORBIDITIES.reduce((n, c) => n + (comorb[c.key] ? 1 : 0), 0),
+    () => COMORBIDITIES.reduce((n, c) => n + (comorb[c.key] ? (c.key !=="none"? 1: 0) : 0), 0),
     [comorb]
   );
 
@@ -252,23 +253,43 @@ export default function VirusTriageExpertSystem() {
     // If "unknown" is set, clear all other comorbidities
     if (!comorb.unknown) return;
     // Only set if not already exactly { unknown: true }
-    setComorb(prev => ({hypertension: false, diabetes: false, cardiovascular: false, respiratory: false, cancer: false, unknown: true}));
+    setComorb(prev => ({hypertension: false, diabetes: false, cardiovascular: false, respiratory: false, cancer: false, unknown: true, none: false}));
   }, [comorb.unknown]);
 
   useMemo(() => {
     // If any other comorbidity is set, clear "unknown"
-    if ((comorb.hypertension||comorb.diabetes||comorb.cardiovascular||comorb.respiratory||comorb.cancer) && !comorb.unknown) return;
-    if ((!comorb.hypertension&&!comorb.diabetes&&!comorb.cardiovascular&&!comorb.respiratory&&!comorb.cancer) && comorb.unknown) return;
+    if ((comorb.hypertension||comorb.diabetes||comorb.cardiovascular||comorb.respiratory||comorb.cancer) && !comorb.unknown && !comorb.none) return;
+    if ((!comorb.hypertension&&!comorb.diabetes&&!comorb.cardiovascular&&!comorb.respiratory&&!comorb.cancer) && !comorb.unknown && comorb.none) return;
+    if ((!comorb.hypertension&&!comorb.diabetes&&!comorb.cardiovascular&&!comorb.respiratory&&!comorb.cancer) && comorb.unknown &&!comorb.none) return;
     // Only set if not already exactly { unknown: true }
-    setComorb(prev => ({ ...prev, unknown: false }));
+    setComorb(prev => ({ ...prev, unknown: false, none: false }));
   }, [comorb.hypertension,comorb.diabetes,comorb.cardiovascular,comorb.respiratory,comorb.cancer]);
+
+    useMemo(() => {
+    // If "none" is set, clear all other comorbidities
+    if (comorb.none) {
+      // set other comorbidities to false
+      setComorb(prev => ({hypertension: false, diabetes: false, cardiovascular: false, respiratory: false, cancer: false, unknown: false, none: true }));
+    } else {
+      // if none is false
+      // if any other comorbidity is true, do nothing
+      if (comorb.hypertension||comorb.diabetes||comorb.cardiovascular||comorb.respiratory||comorb.cancer||comorb.unknown) return;
+      setComorb(prev => ({ ...prev, unknown: false }));
+    }
+  }, [comorb.none]);
 
 
   //Symptom unknown logic
   useMemo(() => {
     if (knownSymptoms == "unknown" && (commonCount + lessCommonCount + seriousCount == 0)) return;
     if (knownSymptoms == "true" && (commonCount + lessCommonCount + seriousCount > 0)) return;
+    if (knownSymptoms == "false" && (commonCount + lessCommonCount + seriousCount == 0)) return;
     if (knownSymptoms === "unknown") {
+      setCommon({fever:false, dryCough:false, tiredness:false});
+      setLessCommon({aches:false, soreThroat:false, diarrhea:false, conjunctivitis:false, headache:false, anosmia:false, runnyNose:false});
+      setSerious({breathing:false, chestPain:false, lossSpeech:false});
+    }
+    if (knownSymptoms === "false") {
       setCommon({fever:false, dryCough:false, tiredness:false});
       setLessCommon({aches:false, soreThroat:false, diarrhea:false, conjunctivitis:false, headache:false, anosmia:false, runnyNose:false});
       setSerious({breathing:false, chestPain:false, lossSpeech:false});
@@ -279,6 +300,9 @@ export default function VirusTriageExpertSystem() {
     // If any symptom is set, set knownSymptoms to true
     if (commonCount + lessCommonCount + seriousCount > 0) {
       setKnownSymptoms("true");
+    }
+    if ((commonCount + lessCommonCount + seriousCount == 0) && knownSymptoms == "false") {
+      setKnownSymptoms("false");
     }
   },[common, lessCommon, serious])
 
@@ -433,7 +457,7 @@ export default function VirusTriageExpertSystem() {
       anySymptoms ? `Symptoms reported: yes` : `Symptoms reported: no`,
       ...explanations,
     ];
-    console.log("Rationale:", rationale);
+    //console.log("Rationale:", rationale);
 
     return { score, classification, color, recommendation, rationale, anySymptoms, seriousPresent };
   }
@@ -468,12 +492,12 @@ export default function VirusTriageExpertSystem() {
         // choose how to turn xs into a score
         const [newScore, newProbJointInfectedBioSym, newProbJointNotInfectedBioSym, newProbConditionHistoryIfInfected, newProbConditionHistoryIfNotInfected] = extractValueFromQueryResult(q)
 
-        console.log("Prolog query:", q);
-        console.log("Prolog score:", newScore);
-        console.log("newProbJointInfectedBioSym:", newProbJointInfectedBioSym);
-        console.log("newProbJointNotInfectedBioSym:", newProbJointNotInfectedBioSym);
-        console.log("newProbConditionHistoryIfInfected:", newProbConditionHistoryIfInfected);
-        console.log("newProbConditionHistoryIfNotInfected:", newProbConditionHistoryIfNotInfected);
+        //console.log("Prolog query:", q);
+        //console.log("Prolog score:", newScore);
+        //console.log("newProbJointInfectedBioSym:", newProbJointInfectedBioSym);
+        //console.log("newProbJointNotInfectedBioSym:", newProbJointNotInfectedBioSym);
+        //console.log("newProbConditionHistoryIfInfected:", newProbConditionHistoryIfInfected);
+        //console.log("newProbConditionHistoryIfNotInfected:", newProbConditionHistoryIfNotInfected);
 
         if (!cancelled.current) {
           // PATCH engine state so the UI re-renders with the async score
@@ -509,7 +533,7 @@ export default function VirusTriageExpertSystem() {
       xs.push(r.value.P_con_infected_1_history);
       xs.push(r.value.P_con_infected_0_history);
     }
-    console.log("xs:", xs);
+
     // choose how to turn xs into a score
     const newScore = xs.length ? xs[0]*10 : 0; 
 
@@ -679,14 +703,14 @@ export default function VirusTriageExpertSystem() {
                   </select>
                 </Labeled>
                 <Labeled label="Sex">
-                  <div className="flex items-center gap-3">
+                  <div className="items-center gap-3 xl:flex items-center gap-3 ">
                     {[
                       { key: "female", label: "Female" },
                       { key: "male", label: "Male" },
-                      { key: "other", label: "Other" },
-                      { key: "unknown", label: "unknown" },
+                      { key: "other", label: "Others" },
+                      { key: "unknown", label: "Not Available" },
                     ].map((o) => (
-                      <label key={o.key} className="flex items-center gap-2 text-sm">
+                      <label key={o.key} className="flex items-center gap-2 text-sm mb-1">
                         <input
                           type="radio"
                           name="sex"
@@ -730,7 +754,7 @@ export default function VirusTriageExpertSystem() {
                     {[
                         { key: "true", label: "Yes" },
                         { key: "false", label: "No" },
-                        { key: "unknown", label: "Unknown" },
+                        { key: "unknown", label: "Not Available" },
                       ].map((o) => (
                         <label key={o.key} className="flex items-center gap-2 text-sm">
                           <input
@@ -753,7 +777,7 @@ export default function VirusTriageExpertSystem() {
                     {[
                         { key: "true", label: "Yes" },
                         { key: "false", label: "No" },
-                        { key: "unknown", label: "Unknown" },
+                        { key: "unknown", label: "Not Available" },
                       ].map((o) => (
                         <label key={o.key} className="flex items-center gap-2 text-sm">
                           <input
@@ -776,7 +800,7 @@ export default function VirusTriageExpertSystem() {
                     {[
                         { key: "true", label: "Yes" },
                         { key: "false", label: "No" },
-                        { key: "unknown", label: "Unknown" },
+                        { key: "unknown", label: "Not Available" },
                       ].map((o) => (
                         <label key={o.key} className="flex items-center gap-2 text-sm">
                           <input
@@ -799,7 +823,7 @@ export default function VirusTriageExpertSystem() {
                     {[
                         { key: "true", label: "Yes" },
                         { key: "false", label: "No" },
-                        { key: "unknown", label: "Unknown" },
+                        { key: "unknown", label: "Not Available" },
                       ].map((o) => (
                         <label key={o.key} className="flex items-center gap-2 text-sm">
                           <input
@@ -822,7 +846,7 @@ export default function VirusTriageExpertSystem() {
                     {[
                         { key: "true", label: "Yes" },
                         { key: "false", label: "No" },
-                        { key: "unknown", label: "Unknown" },
+                        { key: "unknown", label: "Not Available" },
                       ].map((o) => (
                         <label key={o.key} className="flex items-center gap-2 text-sm">
                           <input
@@ -850,8 +874,9 @@ export default function VirusTriageExpertSystem() {
                 <Labeled label="Do you know symptoms information?">
                   <div className="flex items-center gap-3">
                     {[
-                          { key: "true", label: "Yes, I know." },
-                          { key: "unknown", label: "I don't know." },
+                          { key: "true", label: "Yes" },
+                          { key: "false", label: "No" },
+                          { key: "unknown", label: "Not Available" },
                         ].map((o) => (
                           <label key={o.key} className="flex items-center gap-2 text-sm">
                             <input
@@ -877,6 +902,14 @@ export default function VirusTriageExpertSystem() {
                 </Labeled>*/}
 
                 <div>
+                  {
+                    knownSymptoms === "true" &&  (commonCount + lessCommonCount + seriousCount == 0) ? (
+                      <div className="flex p-3 rounded-xl bg-yellow-50 border border-yellow-200 text-sm text-yellow-800 gap-2 mb-2">
+                        <Info className="w-4 h-4 mb-2" />
+                        <span className="font-medium">You indicated you know the symptoms, but none are selected. Please review.</span>
+                      </div>
+                    ) : null
+                  }
                   <div className="text-sm text-left font-medium mb-2">Common</div>
                   <Pills
                     items={COMMON_SYMPTOMS}
@@ -914,14 +947,32 @@ export default function VirusTriageExpertSystem() {
               subtitle="Probability-based triage derived from your inputs"
             >
               {/* Color theme by classification */}
-              <Badge classification={engine.classification} color={engine.color} />
+              
+              {
+                knownSymptoms === "true" &&  (commonCount + lessCommonCount + seriousCount == 0) ? (
+                  <div className="flex p-3 rounded-xl bg-yellow-50 border border-yellow-200 text-sm text-yellow-800 gap-2 mb-2">
+                    <Info className="w-8 h-8 mb-2" />
+                    <span className="font-medium">You indicated you know the symptoms, but none are selected. Please review.</span>
+                  </div>
+                ) : <Badge classification={engine.classification} color={engine.color} />
+              }
+              
 
               <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-white">Risk score</span>
-                  <span className="text-sm font-semibold text-white">{engine.score.toFixed(1)} / 10.0</span>
-                </div>
-                <Progress value={engine.score} max={10} />
+                {
+                  knownSymptoms === "true" &&  (commonCount + lessCommonCount + seriousCount == 0) ? (null
+                  ) : (
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-white">Risk score</span>
+                        <span className="text-sm font-semibold text-white">{engine.score.toFixed(1)} / 10.0</span>
+                      </div>
+                      <Progress value={engine.score} max={10} />
+                    </div>
+                  )
+                }
+                
+
 
                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm">
                   <p className="font-medium mb-1">Recommendation</p>
