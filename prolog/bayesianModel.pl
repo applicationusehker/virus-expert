@@ -137,6 +137,10 @@ j_prob_sym_bio([commonS=1, less_commonS=1, seriousS=1, male=1, age_above70=1, pr
 j_prob_sym_bio([commonS=1, less_commonS=1, seriousS=1, male=1, age_above70=1, pre_condition=1, infected=0], 0.0002).
 j_prob_sym_bio([commonS=1, less_commonS=1, seriousS=1, male=1, age_above70=1, pre_condition=1, infected=1], 0.04187).
 
+% edge case to avoid zero probability
+j_prob_sym_bio([commonS=0, less_commonS=0, seriousS=0, male=0, age_above70=1, pre_condition=0, infected=1], 0.00001).
+
+
 
 % --- Conditional probability table P(A=0 | B=1, probability)----------------
 % Format: c_prob(A=Val, B=InfectedVal, Probability)
