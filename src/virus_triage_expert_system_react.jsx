@@ -617,26 +617,54 @@ export default function VirusTriageExpertSystem() {
     setEvaluated(false);
   };
 
-  const loadDemo = () => {
+  const loadDemo1 = () => {
     setAgeAbove70("true");
     setSex("male");
     setComorb({ hypertension: true });
     setCloseContact("true");
-    setCloseContactDays(4);
     setCrowdedIndoor("true");
-    setCrowdedDays(3);
     setTravelVirusville("false");
-    setTravelDays("");
     setSurfacePlasticSteel("true");
     setSurfaceCopperCardboard("false");
-    setSurfaceHours(18);
     setKnownSymptoms("true");
-    setOnsetDate(new Date().toISOString().slice(0, 10));
     setCommon({ fever: true, dryCough: true, tiredness: false });
     setLessCommon({ anosmia: true, headache: true });
     setSerious({});
     setEvaluated(true);
   };
+
+  const loadDemo2 = () => {
+    setAgeAbove70("false");
+    setSex("female");
+    setComorb({ none: true });
+    setCloseContact("false");
+    setCrowdedIndoor("unknown");
+    setTravelVirusville("unknown");
+    setSurfacePlasticSteel("unknown");
+    setSurfaceCopperCardboard("unknown");
+    setKnownSymptoms("true");
+    setCommon({});
+    setLessCommon({});
+    setSerious({chestPain: true});
+    setEvaluated(true);
+  };
+
+  const loadDemo3 = () => {
+    setAgeAbove70("false");
+    setSex("male");
+    setComorb({ respiratory: true, cancer: true });
+    setCloseContact("true");
+    setCrowdedIndoor("unknown");
+    setTravelVirusville("unknown");
+    setSurfacePlasticSteel("unknown");
+    setSurfaceCopperCardboard("unknown");
+    setKnownSymptoms("true");
+    setCommon({dryCough: true});
+    setLessCommon({});
+    setSerious({});
+    setEvaluated(true);
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 text-slate-900">
@@ -659,8 +687,16 @@ export default function VirusTriageExpertSystem() {
           <div className="flex items-center gap-2">
             <button
               className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-400"
-              onClick={loadDemo}
-            >Load demo</button>
+              onClick={loadDemo1}
+            >Demo 1</button>
+            <button
+              className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-400"
+              onClick={loadDemo2}
+            >Demo 2</button>
+            <button
+              className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-400"
+              onClick={loadDemo3}
+            >Demo 3</button>
             <button
               className="px-5 py-2 text-sm rounded-lg border border-red-400 text-white bg-red-400 hover:border-red-800 hover:bg-red-800 "
               onClick={resetAll}
