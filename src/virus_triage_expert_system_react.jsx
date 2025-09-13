@@ -653,7 +653,7 @@ export default function VirusTriageExpertSystem() {
     setAgeAbove70("false");
     setSex("male");
     setComorb({ respiratory: true, cancer: true });
-    setCloseContact("true");
+    setCloseContact("unknown");
     setCrowdedIndoor("unknown");
     setTravelVirusville("unknown");
     setSurfacePlasticSteel("unknown");
