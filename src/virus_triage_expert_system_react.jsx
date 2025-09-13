@@ -340,21 +340,6 @@ export default function VirusTriageExpertSystem() {
   ]);
 
   function buildEngine({inputs, prolog = {}}) {
-    // Rule weights (transparent & adjustable)
-    const weights = {
-      common: 2, // each
-      lessCommon: 1, // each
-      anosmiaBoost: 2, // if anosmia/hyposmia present, treat as stronger signal
-      closeContact: 4, // within 14 days
-      crowdedIndoor: 2, // within 14 days
-      travelVirusville: 3, // within 14 days
-      surfacePlasticSteel: 1.5, // <=72h
-      surfaceCopperCardboard: 1, // <=24h
-      age70: 2,
-      perComorbidity: 1,
-      maleExtraIfRisk: 1,
-    };
-
     const explanations = [];
 
     // Serious symptoms → immediate emergency guidance
@@ -368,8 +353,6 @@ export default function VirusTriageExpertSystem() {
     }
 
     // Symptoms scoring
-    const commonActive = COMMON_SYMPTOMS.filter((s) => common[s.key]).map((s) => s.label);
-    const lessActive = LESS_COMMON_SYMPTOMS.filter((s) => lessCommon[s.key]).map((s) => s.label);
 
     if (commonCount > 0) {
       explanations.push(`Common symptoms: ${commonCount}.`);
@@ -428,8 +411,8 @@ export default function VirusTriageExpertSystem() {
     let color = "emerald";
     let recommendation = "No immediate signs suggest infection. Monitor your health and practice hygiene.";
 
-    const HIGH = 7;
-    const MID = 5;
+    const HIGH = 0.70;
+    const MID = 0.50;
 
     if (seriousPresent) {
       classification = "Emergency";
@@ -453,7 +436,7 @@ export default function VirusTriageExpertSystem() {
 
     // Build rationale list with compact summary on top
     const rationale = [
-      `Score = ${score.toFixed(1)} (HIGH≥${HIGH}, MID≥${MID})`,
+      `Score = ${score.toFixed(2)} ( HIGH ≥ ${HIGH} , MID ≥ ${MID} )`,
       anySymptoms ? `Symptoms reported: yes` : `Symptoms reported: no`,
       ...explanations,
     ];
@@ -535,7 +518,7 @@ export default function VirusTriageExpertSystem() {
     }
 
     // choose how to turn xs into a score
-    const newScore = xs.length ? xs[0]*10 : 0; 
+    const newScore = xs.length ? xs[0] : 0; 
 
     //P_joint_infected_1_sym_bio - probJointInfectedBioSym
     const probJointInfectedBioSym = xs.length ? xs[1] : 0; 
@@ -667,8 +650,8 @@ export default function VirusTriageExpertSystem() {
             <div>
               <h1 className="text-2xl font-bold leading-tight">Virus Triage Expert System (2519)</h1>
               <p className="text-slate-600 max-w-3xl text-sm">
-                Decision support tool based on stated symptoms, recent exposures, and risk factors. Not a medical diagnosis.<br/>
-                Developed by Dennis Chan
+                Decision support tool based on patient status and recent exposures. Not a medical diagnosis.<br/>
+                Developed by Chan Man Chak
               </p>
             </div>
           </div>
@@ -772,7 +755,7 @@ export default function VirusTriageExpertSystem() {
                 </div>
 
                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <Labeled label="Visited crowded indoor space (poor ventilation) within 14 days">
+                  <Labeled label="Visited crowded indoor space within 14 days">
                     <div className="flex items-center gap-3">
                     {[
                         { key: "true", label: "Yes" },
@@ -964,10 +947,10 @@ export default function VirusTriageExpertSystem() {
                   ) : (
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-white">Risk score</span>
-                        <span className="text-sm font-semibold text-white">{engine.score.toFixed(1)} / 10.0</span>
+                        <span className="text-sm text-white">Probability of infection</span>
+                        <span className="text-sm font-semibold text-white">{engine.score.toFixed(2)} / 1.00</span>
                       </div>
-                      <Progress value={engine.score} max={10} />
+                      <Progress value={engine.score} max={1} />
                     </div>
                   )
                 }
