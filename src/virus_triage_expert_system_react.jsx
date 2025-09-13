@@ -651,7 +651,7 @@ export default function VirusTriageExpertSystem() {
 
   const loadDemo3 = () => {
     setAgeAbove70("false");
-    setSex("male");
+    setSex("unknown");
     setComorb({ respiratory: true, cancer: true });
     setCloseContact("unknown");
     setCrowdedIndoor("unknown");
@@ -1041,19 +1041,19 @@ export default function VirusTriageExpertSystem() {
                 <tbody>
                   <tr className="border border-white">
                     <td className="border border-white text-xs"> &nbsp; P( Infected, Bio, Symptom )</td>
-                    <td className="text-center"> {probJointInfectedBioSym.toFixed(4)} </td>
+                    <td className="text-center"> {probJointInfectedBioSym.toFixed(5)} </td>
                   </tr>
                   <tr className="border border-white">
                     <td className="border border-white text-xs"> &nbsp; P( Not Infected, Bio, Symptom )</td>
-                    <td className="text-center"> {probJointNotInfectedBioSym.toFixed(4)} </td>
+                    <td className="text-center"> {probJointNotInfectedBioSym.toFixed(5)} </td>
                   </tr>
                   <tr className="border border-white">
                     <td className="border border-white text-xs"> &nbsp; P( History | Infected )</td>
-                    <td className="text-center"> {probConditionHistoryIfInfected.toFixed(4)} </td>
+                    <td className="text-center"> {probConditionHistoryIfInfected.toFixed(5)} </td>
                   </tr>
                   <tr className="border border-white">
                     <td className="border border-white text-xs"> &nbsp; P( History | Not Infected )</td>
-                    <td className="text-center"> {probConditionHistoryIfNotInfected.toFixed(4)} </td>
+                    <td className="text-center"> {probConditionHistoryIfNotInfected.toFixed(5)} </td>
                   </tr>
                   <tr className="border border-white">
                     <td className="border border-white text-xs"> &nbsp; P( Infected | All Conditions )</td>
