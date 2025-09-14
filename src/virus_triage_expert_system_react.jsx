@@ -19,13 +19,9 @@ import variablePng from "./assets/variable.png";
  * -------------------------------------------------------
  * • UI/UX: clean, grid-based layout using Tailwind classes
  * • Inputs: Bio data, Exposure history, Symptoms & onset date
- * • Engine: transparent rule-based scoring with explanations
- * • Output: Risk class, action guidance, and rule breakdown
- *
- * How to use in your app:
- *   1) Create a new React app (Vite or CRA).
- *   2) Add TailwindCSS (recommended) or adapt classes to your CSS.
- *   3) Import and render <VirusTriageExpertSystem /> in your page.
+ * • Engine: Prolog Bayesian model
+ * • Output: Probability, action guidance, and rule breakdown
+
  */
 
 // --- Domain Knowledge (from the scenario) -----------------------------------
@@ -99,20 +95,6 @@ function OutputSection({ icon: Icon, title, subtitle, children }) {
     </section>
   );
 }
-
-//function Labeled({ label, hint, children }) {
-//  return (
-//    <label className="block mb-3 text-left">
-//      <div className="flex items-center gap-2 mb-1">
-//        <span className="text-sm font-medium text-slate-700">{label}</span>
-//        {hint && (
-//          <span className="text-[11px] text-slate-500">{hint}</span>
-//        )}
-//      </div>
-//      {children}
-//    </label>
-//  );
-//}
 
 function Labeled({ label, hint, children }) {
   return (
@@ -448,12 +430,8 @@ export default function VirusTriageExpertSystem() {
   // 2) Engine state from pure builder
   const [engine, setEngine] = useState(() => buildEngine(inputs));
 
-  // 3) Recompute engine whenever inputs change (pure)
-  //useMemo(() => {
-  //  setEngine(buildEngine(inputs));
-  //}, [inputs]);
 
-  // 4) Run Prolog async and PATCH the score when it finishes
+  // 3) Run Prolog async and PATCH the probability when it finishes
   useEffect(() => {
     let query_string;
 
@@ -764,12 +742,6 @@ export default function VirusTriageExpertSystem() {
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <Labeled label="Close proximity contact with infected/symptomatic person within 14 days">
                     <div className="flex items-center gap-3">
-                    {/*<Checkbox
-                      id="close-contact"
-                      checked={closeContact}
-                      onChange={setCloseContact}
-                      label="Close proximity contact with infected/symptomatic person within 14 days"
-                    />*/}
                     {[
                         { key: "true", label: "Yes" },
                         { key: "false", label: "No" },
@@ -910,16 +882,6 @@ export default function VirusTriageExpertSystem() {
                         ))}
                   </div>
                 </Labeled>
-
-                {/*<Labeled label="Onset date (first symptom)">
-                  <input
-                    type="date"
-                    value={onsetDate}
-                    onChange={(e) => setOnsetDate(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                  />
-                </Labeled>*/}
-
                 <div>
                   {
                     knownSymptoms === "true" &&  (commonCount + lessCommonCount + seriousCount == 0) ? (
