@@ -169,11 +169,18 @@ c_prob(copper=1, infected=1, 0.749542170279359).
 
 
 % --- Helper: get Var's value from an assignment list Var=Val ----------------
+% e.g., get([a=1,b=0], a, Val).
+%       Result: Val=1.
+%       get([a=1,b=0], Var, 1).
+%       Result: Var=a.
 get([V=Val|_], V, Val) :- !.
 get([_|T], V, Val) :- get(T, V, Val).
 
 
 % --- Enumerate and order all complete assignments consistent with Conditions -------------
+% e.g., complete_world([commonS=0, less_commonS=1, seriousS=0, male=0, age_above70=0, infected=1], World).
+%       Result: World = [commonS=0, less_commonS=1, seriousS=0, male=0, age_above70=0, pre_condition=0, infected=1];
+%               World = [commonS=0, less_commonS=1, seriousS=0, male=0, age_above70=0, pre_condition=1, infected=1].
 complete_world(Conditions, OrderedWorld) :-
     vars(Vs),
     assign_all(Vs, Conditions, World),
@@ -200,15 +207,20 @@ consistent([V=Val|Es], World) :-
     consistent(Es, World).
 
 
-% --- Variable list ------------------------
+% ------------------sum all joint probabilities of complete worlds consistent with Conditions------------------
+% e.g., query_joint_prob_sym_bio([infected=1,commonS=1, less_commonS=0, seriousS=0, age_above70=0, pre_condition=1], P).
+%       Result: P = 0.288125.
 query_joint_prob_sym_bio(Conditions, SumP) :-
     findall(P, (complete_world(Conditions, W), j_prob_sym_bio(W,P)), Ps),
     sum_list(Ps, SumP).
 
 
+% ------------------multiply all conditional probabilities of history conditions given infected status------------------
 % query P(A|B)
 % Conditions A: [close=0,travel=1]
 % GivenCondition B: infected=1
+% e.g., query_joint_prob_history([close=0,travel=1], infected=1, P).
+%       Result: P = 0.04200.
 query_joint_prob_history([],_, 1.0).
 query_joint_prob_history([C|Cs],GivenCondition, ProductP) :-
     c_prob(C, GivenCondition, TempP),
@@ -216,8 +228,19 @@ query_joint_prob_history([C|Cs],GivenCondition, ProductP) :-
     ProductP is TempP * NextP.
 
 
-% --- Posterior: P(Query | Evidence) by enumeration and normalization ---------
+% ----- Posterior: P(Query | Evidence) by enumeration and normalization ---------
 % Usage: prob(Var=Val, EvidenceList, P).
+% Arguments:
+%   Query: a single variable assignment, e.g., infected=1
+%   Evidence_sym_bio: list of variable assignments for symptoms and bio factors, e.g., [commonS=1, less_commonS=1, seriousS=0]
+%   Evidence_history: list of variable assignments for history factors, e.g., [close=1, indoor=1, travel=0, plastic=1, copper=0]
+%   P: the computed posterior probability P( infected=1 | Evidence)
+%   P_joint_1_sym_bio: the joint probability P(infected=1, Evidence_sym_bio)
+%   P_joint_0_sym_bio: the joint probability P(infected=0, Evidence_sym_bio)
+%   P_con_1_history: the conditional probability P(Evidence_history | infected=1)
+%   P_con_0_history: the conditional probability P(Evidence_history | infected=0)
+% Example query:
+% ?- prob(infected=1,[commonS=1, less_commonS=1, seriousS=0],[close=1, indoor=1, travel=0, plastic=1, copper=0], P, P_joint_1_sym_bio, P_joint_0_sym_bio, P_con_1_history, P_con_0_history).
 prob(Query, Evidence_sym_bio, Evidence_history, P, P_joint_1_sym_bio, P_joint_0_sym_bio, P_con_1_history, P_con_0_history) :-
     % Build full condition lists for numerator and denominator
     query_joint_prob_sym_bio([infected=0|Evidence_sym_bio], P_joint_0_sym_bio),
@@ -235,15 +258,39 @@ prob(Query, Evidence_sym_bio, Evidence_history, P, P_joint_1_sym_bio, P_joint_0_
         )
     ).
 
+% ---- Helper to extract the value from the query Var=Val ----
+% e.g. extrat_infected_value(infected=1, Val).
+%      Result: Val=1.
 extrat_infected_value(V=Val, Val).
 
 
 
 % --------- Convenience demos (run ?- demo.) ---------------------------------
 demo :-
-    prob(infected=1,[commonS=1, less_commonS=1, seriousS=1, male=1, age_above70=0, pre_condition=0],[close=1, indoor=1], P, P_joint_infected_1_sym_bio, P_joint_infected_0_sym_bio, P_con_infected_1_history, P_con_infected_0_history),
-    format("P(infected=1 | commonS=1, less_commonS=1, seriousS=1, male=1, age_above70=0, pre_condition=0, close=1, indoor=1)               = ~6f~n", [P]),
-    format("P(infected=1,sym,bio) (joint)     = ~6f~n", [P_joint_infected_1_sym_bio]),
-    format("P(infected=0,sym,bio) (joint)     = ~6f~n", [P_joint_infected_0_sym_bio]),
-    format("P(history | infected=1)           = ~6f~n", [P_con_infected_1_history]),
-    format("P(history | infected=0)           = ~6f~n", [P_con_infected_0_history]).
+    %demo1
+    prob(infected=1,[commonS=1, less_commonS=1, seriousS=0, male=1, age_above70=1, pre_condition=1],[close=1, indoor=1, travel=0, plastic=1, copper=0], P1, P_joint_infected_1_sym_bio1, P_joint_infected_0_sym_bio1, P_con_infected_1_history1, P_con_infected_0_history1),
+    format("Demo1:~n"),
+    format("swi-prolog command: prob(infected=1,[commonS=1, less_commonS=1, seriousS=0, male=1, age_above70=1, pre_condition=1],[close=1, indoor=1, travel=0, plastic=1, copper=0], P1, P_joint_infected_1_sym_bio1, P_joint_infected_0_sym_bio1, P_con_infected_1_history1, P_con_infected_0_history1).~n"),
+    format("P(commonS=1, less_commonS=1, seriousS=0, male=1, age_above70=1, pre_condition=1, close=1, indoor=1, travel=0, plastic=1, copper=0)= ~6f~n", [P1]),
+    format("P(infected=1,sym,bio) (joint)     = ~6f~n", [P_joint_infected_1_sym_bio1]),
+    format("P(infected=0,sym,bio) (joint)     = ~6f~n", [P_joint_infected_0_sym_bio1]),
+    format("P(history | infected=1)           = ~6f~n", [P_con_infected_1_history1]),
+    format("P(history | infected=0)           = ~6f~n", [P_con_infected_0_history1]),
+    %demo2
+    prob(infected=1,[commonS=0, less_commonS=0, seriousS=1, male=0, age_above70=0, pre_condition=0],[close=0], P2, P_joint_infected_1_sym_bio2, P_joint_infected_0_sym_bio2, P_con_infected_1_history2, P_con_infected_0_history2),
+    format("Demo2:~n"),
+    format("swi-prolog command: prob(infected=1,[commonS=0, less_commonS=0, seriousS=1, male=0, age_above70=0, pre_condition=0],[close=0], P2, P_joint_infected_1_sym_bio2, P_joint_infected_0_sym_bio2, P_con_infected_1_history2, P_con_infected_0_history2).~n"),
+    format("P(infected=1 | commonS=0, less_commonS=0, seriousS=1, male=0, age_above70=0, pre_condition=0, close=0)= ~6f~n", [P2]),
+    format("P(infected=1,sym,bio) (joint)     = ~6f~n", [P_joint_infected_1_sym_bio2]),
+    format("P(infected=0,sym,bio) (joint)     = ~6f~n", [P_joint_infected_0_sym_bio2]),
+    format("P(history | infected=1)           = ~6f~n", [P_con_infected_1_history2]),
+    format("P(history | infected=0)           = ~6f~n", [P_con_infected_0_history2]),
+    %demo3
+    prob(infected=1,[commonS=1, less_commonS=0, seriousS=0, age_above70=0, pre_condition=1],[], P3, P_joint_infected_1_sym_bio3, P_joint_infected_0_sym_bio3, P_con_infected_1_history3, P_con_infected_0_history3),
+    format("Demo3:~n"),
+    format("swi-prolog command: prob(infected=1,[commonS=1, less_commonS=0, seriousS=0, age_above70=0, pre_condition=1],[], P3, P_joint_infected_1_sym_bio3, P_joint_infected_0_sym_bio3, P_con_infected_1_history3, P_con_infected_0_history3).~n"),
+    format("P(infected=1 | commonS=1, less_commonS=0, seriousS=0, age_above70=0, pre_condition=1)= ~6f~n", [P3]),
+    format("P(infected=1,sym,bio) (joint)     = ~6f~n", [P_joint_infected_1_sym_bio3]),
+    format("P(infected=0,sym,bio) (joint)     = ~6f~n", [P_joint_infected_0_sym_bio3]),
+    format("P(history | infected=1)           = ~6f~n", [P_con_infected_1_history3]),
+    format("P(history | infected=0)           = ~6f~n", [P_con_infected_0_history3]).
