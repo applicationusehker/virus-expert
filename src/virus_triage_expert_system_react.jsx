@@ -63,10 +63,30 @@ const SurfaceType = {
 };
 
 function clamp(n, min, max) {
+  // Clamp number n to the range [min, max]
+  // Args: 
+  //   n: number to clamp
+  //   min: minimum value
+  //   max: maximum value
+  // Returns: clamped number
+  //          Example: clamp(5, 1, 10) => 5
+  //          Example: clamp(-5, 1, 10) => 1
   return Math.max(min, Math.min(max, n ?? 0));
 }
 
 function Section({ icon: Icon, title, subtitle, children }) {
+  // A generic section container with title, subtitle, and icon
+  // Args:
+  //   icon: React component for the icon
+  //   title: string for the title
+  //   subtitle: string for the subtitle (optional)
+  //   children: React nodes for the content
+  // Returns: JSX element
+  //          Example usage: <Section icon={User} title="Bio Data" subtitle="Your personal information">...</Section>
+  //          Renders a section with a white background, rounded corners, and shadow
+  //          The icon is displayed in a circle on the left, with the title and subtitle on the right
+  //          The content is displayed below the title and subtitle
+
   return (
     <section className="bg-white/80 backdrop-blur rounded-2xl shadow-sm border border-slate-200 p-5">
       <header className="flex items-start gap-3 mb-4">
@@ -82,6 +102,17 @@ function Section({ icon: Icon, title, subtitle, children }) {
 }
 
 function OutputSection({ icon: Icon, title, subtitle, children }) {
+  // A generic output section container with title, subtitle, and icon
+  // Args:
+  //   icon: React component for the icon
+  //   title: string for the title
+  //   subtitle: string for the subtitle (optional)
+  //   children: React nodes for the content
+  // Returns: JSX element
+  //          Example usage: <OutputSection icon={ChartColumn} title="Results" subtitle="Your infection probability">...</OutputSection>
+  //          Renders a section with a dark background, rounded corners, and shadow
+  //          The icon is displayed in a circle on the left, with the title and subtitle on the right
+  //          The content is displayed below the title and subtitle
   return (
     <section className="bg-neutral-700 backdrop-blur rounded-2xl shadow-sm border border-slate-200 p-5">
       <header className="flex items-start gap-3 mb-4">
@@ -97,6 +128,17 @@ function OutputSection({ icon: Icon, title, subtitle, children }) {
 }
 
 function Labeled({ label, hint, children }) {
+  // A generic labeled container for form inputs
+  // Args:
+  //   label: string for the label
+  //   hint: string for the hint (optional)
+  //   children: React nodes for the input
+  // Returns: JSX element
+  //          Example usage: <Labeled label="Age above 70?" hint="Select yes if you are above 70 years old">...</Labeled>
+  //          Renders a fieldset with a legend containing the label and hint
+  //          The input is displayed below the legend
+  //          The label is bold and the hint is smaller and lighter
+  //          The fieldset has a bottom margin for spacing
   return (
     <fieldset className="block mb-3 text-left">
       <legend className="flex items-center gap-2 mb-1">
@@ -109,6 +151,17 @@ function Labeled({ label, hint, children }) {
 }
 
 function Checkbox({ checked, onChange, label, id }) {
+  // A generic checkbox input with label
+  // Args:
+  //   checked: boolean for the checked state
+  //   onChange: function to call when the checked state changes
+  //   label: string for the label
+  //   id: string for the input id
+  // Returns: JSX element
+  //          Example usage: <Checkbox checked={true} onChange={(v) => console.log(v)} label="I agree to the terms" id="agree" />
+  //          Renders a checkbox input with a label
+  //          The label is clickable and toggles the checkbox
+  //          The checkbox is styled with Tailwind classes
   return (
     <div className="flex items-center gap-2">
       <input
@@ -126,6 +179,19 @@ function Checkbox({ checked, onChange, label, id }) {
 }
 
 function NumberInput({ value, onChange, min = 0, max = 999, step = 1, placeholder }) {
+  // A generic number input with label
+  // Args:
+  //   value: number for the input value
+  //   onChange: function to call when the value changes
+  //   min: number for the minimum value (default: 0)
+  //   max: number for the maximum value (default: 999)
+  //   step: number for the step value (default: 1)
+  //   placeholder: string for the placeholder (optional)
+  // Returns: JSX element
+  //          Example usage: <NumberInput value={5} onChange={(v) => console.log(v)} min={0} max={10} step={1} placeholder="Enter a number" />
+  //          Renders a number input with Tailwind classes
+  //          The input is styled with padding, border, and focus ring
+  //          The input is constrained to the min, max, and step values
   return (
     <input
       type="number"
@@ -141,6 +207,17 @@ function NumberInput({ value, onChange, min = 0, max = 999, step = 1, placeholde
 }
 
 function Pills({ items = [], onToggle, state }) {
+  // A generic pills input for multiple selection
+  // Args:
+  //   items: array of { key: string, label: string } for the pills
+  //   onToggle: function to call when a pill is toggled, receives (key, newState)
+  //   state: object mapping keys to boolean for the current state
+  // Returns: JSX element
+  //          Example usage: <Pills items={[{ key: 'fever', label: 'Fever' }]} onToggle={(k, v) => console.log(k, v)} state={{ fever: true }} />
+  //          Renders a list of pills that can be toggled on and off
+  //          The pills are styled with padding, border, and background color
+  //          The active pills are highlighted with a different background and text color
+  //          The pills are wrapped to the next line if they exceed the container width
   return (
     <div className="flex flex-wrap gap-2">
       {items.map((s) => {
@@ -165,6 +242,15 @@ function Pills({ items = [], onToggle, state }) {
 }
 
 function Progress({ value, max }) {
+  // A generic progress bar
+  // Args:
+  //   value: number for the current value
+  //   max: number for the maximum value
+  // Returns: JSX element
+  //          Example usage: <Progress value={50} max={100} />
+  //          Renders a progress bar with a filled portion representing the value/max ratio
+  //          The progress bar is styled with Tailwind classes
+  //          The filled portion has a transition effect when the value changes
   const pct = clamp((value / max) * 100, 0, 100);
   return (
     <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
@@ -181,6 +267,7 @@ function Progress({ value, max }) {
 
 // --- Main Component ----------------------------------------------------------
 export default function VirusTriageExpertSystem() {
+  // State variables for the form inputs and outputs
   // Bio
   const [ageAbove70, setAgeAbove70] = useState("unknown"); // "true" | "false" | "unknown"
   const [sex, setSex] = useState("unknown"); // "male" | "female" | "other" | "unknown"
@@ -209,9 +296,16 @@ export default function VirusTriageExpertSystem() {
   const [common, setCommon] = useState({});
   const [lessCommon, setLessCommon] = useState({});
   const [serious, setSerious] = useState({});
-
   const [evaluated, setEvaluated] = useState(false);
 
+  // Derived state
+  // Counts of selected items
+  // useMemo to avoid unnecessary recalculations
+  // Recalculate only when the relevant state changes
+  // e.g. comorbidityCount changes only when comorb changes
+  // e.g. commonCount changes only when common changes
+  // e.g. lessCommonCount changes only when lessCommon changes
+  // e.g. seriousCount changes only when serious changes
   const comorbidityCount = useMemo(
     () => COMORBIDITIES.reduce((n, c) => n + (comorb[c.key] ? (c.key !=="none"? 1: 0) : 0), 0),
     [comorb]
@@ -231,6 +325,10 @@ export default function VirusTriageExpertSystem() {
   );
 
   // Pre-existing condition "unknown" logic
+  // If "unknown" is set, clear all other comorbidities
+  // If any other comorbidity is set, clear "unknown"
+  // If "none" is set, clear all other comorbidities
+  // If any other comorbidity is set, clear "none"
   useMemo(() => {
     // If "unknown" is set, clear all other comorbidities
     if (!comorb.unknown) return;
@@ -247,7 +345,7 @@ export default function VirusTriageExpertSystem() {
     setComorb(prev => ({ ...prev, unknown: false, none: false }));
   }, [comorb.hypertension,comorb.diabetes,comorb.cardiovascular,comorb.respiratory,comorb.cancer]);
 
-    useMemo(() => {
+  useMemo(() => {
     // If "none" is set, clear all other comorbidities
     if (comorb.none) {
       // set other comorbidities to false
@@ -262,6 +360,8 @@ export default function VirusTriageExpertSystem() {
 
 
   //Symptom unknown logic
+  // If knownSymptoms is "unknown", clear all symptoms
+  // if knownSymptoms is "false", clear all symptoms
   useMemo(() => {
     if (knownSymptoms == "unknown" && (commonCount + lessCommonCount + seriousCount == 0)) return;
     if (knownSymptoms == "true" && (commonCount + lessCommonCount + seriousCount > 0)) return;
@@ -278,8 +378,9 @@ export default function VirusTriageExpertSystem() {
     }
   },[knownSymptoms])
 
+  // If any symptom is set, set knownSymptoms to "true"
+  // If no symptoms are set, set knownSymptoms to "false"
   useMemo(() => {
-    // If any symptom is set, set knownSymptoms to true
     if (commonCount + lessCommonCount + seriousCount > 0) {
       setKnownSymptoms("true");
     }
@@ -291,6 +392,7 @@ export default function VirusTriageExpertSystem() {
   // ========================================================
   // ================= Expert System Engine =================
   // ========================================================
+  // State variables for the expert system outputs
   const cancelled = useRef(false); // declare before effects
   const [score, setScore] = useState(0);
   const [probJointInfectedBioSym, setProbJointInfectedBioSym] = useState(0);
@@ -322,6 +424,22 @@ export default function VirusTriageExpertSystem() {
   ]);
 
   function buildEngine({inputs, prolog = {}}) {
+    // Build the expert system engine state from the inputs
+    // Args:
+    //   inputs: object containing all input values
+    //   prolog: object containing Prolog-related values (optional)
+    // Returns: object containing the engine state
+    //          Example usage: buildEngine({ ageAbove70: "true", ... })
+    //          Returns an object with the following properties:
+    //            - score: number between 0 and 1 representing the infection probability
+    //            - classification: string representing the risk classification
+    //            - color: string representing the color for the classification
+    //            - recommendation: string representing the action recommendation
+    //            - rationale: array of strings representing the rationale for the classification
+    //            - anySymptoms: boolean indicating if any symptoms were reported
+    //            - seriousPresent: boolean indicating if any serious symptoms were reported
+
+    // Initialize
     const explanations = [];
 
     // Serious symptoms → immediate emergency guidance
@@ -335,7 +453,6 @@ export default function VirusTriageExpertSystem() {
     }
 
     // Symptoms scoring
-
     if (commonCount > 0) {
       explanations.push(`Common symptoms: ${commonCount}.`);
     }
@@ -433,6 +550,15 @@ export default function VirusTriageExpertSystem() {
 
   // 3) Run Prolog async and PATCH the probability when it finishes
   useEffect(() => {
+    // Run the Prolog query asynchronously and update the score when it completes
+    // Args: none (uses inputs from closure)
+    // Returns: cleanup function to cancel the query if the component unmounts or inputs change
+    //          Example usage: useEffect(() => { ... }, [inputs])
+    //          Runs the Prolog query whenever the inputs change
+    //          Updates the score state variable when the query completes
+    //          Cancels the query if the component unmounts or inputs change before it completes
+
+    // Query string from inputs
     let query_string;
 
     cancelled.current = false;
@@ -452,13 +578,6 @@ export default function VirusTriageExpertSystem() {
 
         // choose how to turn xs into a score
         const [newScore, newProbJointInfectedBioSym, newProbJointNotInfectedBioSym, newProbConditionHistoryIfInfected, newProbConditionHistoryIfNotInfected] = extractValueFromQueryResult(q)
-
-        //console.log("Prolog query:", q);
-        //console.log("Prolog score:", newScore);
-        //console.log("newProbJointInfectedBioSym:", newProbJointInfectedBioSym);
-        //console.log("newProbJointNotInfectedBioSym:", newProbJointNotInfectedBioSym);
-        //console.log("newProbConditionHistoryIfInfected:", newProbConditionHistoryIfInfected);
-        //console.log("newProbConditionHistoryIfNotInfected:", newProbConditionHistoryIfNotInfected);
 
         if (!cancelled.current) {
           // PATCH engine state so the UI re-renders with the async score
@@ -484,6 +603,12 @@ export default function VirusTriageExpertSystem() {
   }, [inputs]);
 
   function extractValueFromQueryResult(queryResult) {
+    // Extract the value from the Prolog query result
+    // Args: queryResult - the result object from swipl.prolog.query()
+    // Returns: array of numbers [newScore, probJointInfectedBioSym, probJointNotInfectedBioSym, probConditionHistoryIfInfected, probConditionHistoryIfNotInfected]
+    //          Example usage: const [score, probJointInfectedBioSym, probJointNotInfectedBioSym, probConditionHistoryIfInfected, probConditionHistoryIfNotInfected] = extractValueFromQueryResult(queryResult)
+    //          Extracts the values of P, P_joint_infected_1_sym_bio, P_joint_infected_0_sym_bio, P_con_infected_1_history, P_con_infected_0_history from the query result
+    //          Returns 0 for each value if not found
     //P
     let xs = [];
     for (let r; (r = queryResult.next()); ) {
@@ -518,8 +643,12 @@ export default function VirusTriageExpertSystem() {
   }
 
   function swi_prolog_query_string(){
-    //"prob(infected=1,[commonS=1, less_commonS=1, seriousS=1, male=1, age_above70=0, pre_condition=0],[close=1, indoor=1, travel=1, plastic=1, copper=1], P)."
-    //"prob(query,condition_S,condition_H, P)."
+    //Function to build the Prolog query string from inputs
+    //Args: inputs={}
+    //Returns: query_string
+    //         return example query strings for testing
+    //         "prob(infected=1,[commonS=1, less_commonS=1, seriousS=1, male=1, age_above70=0, pre_condition=0],[close=1, indoor=1, travel=1, plastic=1, copper=1], P)."
+    //         "prob(query,condition_S,condition_H, P)."
 
     //initialize
     let query="infected=1"
@@ -572,8 +701,11 @@ export default function VirusTriageExpertSystem() {
   // ========================================================
   // ================= Expert System Engine =================
   // ========================================================
-
-
+  // Reset and Demo functions
+  // Reset all inputs to default values
+  // Demo 1: an elderly male with multiple cardinal symptoms and recent indoor contact is classified as “likely infection”
+  // Demo 2: a middle-aged female with chest pain and recent contact is “unlikely” yet flagged for ur-gent assessment
+  // Demo 3: a younger adult with a single symptom and pre-existent health conditions is “unlikely in-fected”
   const resetAll = () => {
     setAgeAbove70("unknown");
     setSex("unknown");
@@ -1071,6 +1203,14 @@ export default function VirusTriageExpertSystem() {
 }
 
 function Badge({ classification, color }) {
+  // Color palette for different classifications
+  // Args:
+  //   classification - string, one of "Emergency", "Likely infection", "Unlikely infection"
+  //   color - string, one of "emerald", "amber", "orange", "rose"
+  // Returns:
+  //   JSX element representing the badge with appropriate color and icon
+
+  // Default to emerald if color not provided or unrecognized
   const palette = {
     emerald: { bg: "bg-emerald-50", text: "text-emerald-800", ring: "ring-emerald-200" },
     amber: { bg: "bg-amber-50", text: "text-amber-900", ring: "ring-amber-200" },
@@ -1090,6 +1230,15 @@ function Badge({ classification, color }) {
 
 
 function EnlargeableImage({ src, alt = "", className = "" }) {
+  // An image that can be clicked to enlarge in a modal
+  // Args:
+  //   src - string, image source URL
+  //   alt - string, alt text for the image
+  //   className - string, additional CSS classes for the image
+  // Returns:
+  //   JSX element representing the image with enlarge-on-click functionality
+
+  // State to track if modal is open
   const [open, setOpen] = useState(false);
 
   // Close on Esc + lock body scroll while open
